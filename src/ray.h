@@ -1,11 +1,11 @@
 #pragma once
+
 #include "vec3.h"
 
-class Ray {
-public:
+struct Ray {
     Vec3 origin;
     Vec3 direction;
 
-    Ray(Vec3 o, Vec3 d)
+    Ray(const Vec3& o, const Vec3& d)
         : origin(o), direction(d) {}
 };
