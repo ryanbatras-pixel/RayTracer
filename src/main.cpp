@@ -1,32 +1,7 @@
-#include <vector>
-
-#include "renderer.h"
+#include <iostream>
 
 int main()
 {
-    std::vector<Sphere> scene;
-
-    scene.push_back(
-        Sphere(
-            Vec3(0,0,-5),
-            1,
-            Vec3(1,0,0)));
-
-    scene.push_back(
-        Sphere(
-            Vec3(2,0,-6),
-            1,
-            Vec3(0,1,0)));
-
-    scene.push_back(
-        Sphere(
-            Vec3(-2,0,-6),
-            1,
-            Vec3(0,0,1)));
-
-    Renderer renderer;
-
-    renderer.render(scene);
-
+    std::cout << "RayTracer is working!" << std::endl;
     return 0;
 }
