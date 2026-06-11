@@ -1,23 +1,41 @@
-#pragma once
+#ifndef SPHERE_H
+#define SPHERE_H
 
-#include "ray.h"
+#include "hittable.h"
 
-struct Sphere {
-    Vec3 center;
-    double radius;
+class sphere : public hittable {
+public:
+    sphere(point3 center, double radius, shared_ptr<material> mat)
+        : center(center), radius(radius), mat(mat) {}
 
-    Sphere(const Vec3& c, double r)
-        : center(c), radius(r) {}
+    bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override {
+        vec3 oc = center - r.origin();
+        auto a = r.direction().length_squared();
+        auto h = dot(r.direction(), oc);
+        auto c = oc.length_squared() - radius * radius;
+        auto discriminant = h * h - a * c;
 
-    bool hit(const Ray& ray) const {
-        Vec3 oc = ray.origin - center;
+        if (discriminant < 0) return false;
 
-        double a = ray.direction.dot(ray.direction);
-        double b = 2.0 * oc.dot(ray.direction);
-        double c = oc.dot(oc) - radius * radius;
+        auto sqrtd = std::sqrt(discriminant);
+        auto root = (h - sqrtd) / a;
+        if (root <= t_min || root >= t_max) {
+            root = (h + sqrtd) / a;
+            if (root <= t_min || root >= t_max) return false;
+        }
 
-        double discriminant = b * b - 4 * a * c;
-
-        return discriminant >= 0;
+        rec.t = root;
+        rec.p = r.at(rec.t);
+        vec3 outward_normal = (rec.p - center) / radius;
+        rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
+        return true;
     }
+
+private:
+    point3 center;
+    double radius;
+    shared_ptr<material> mat;
 };
+
+#endif
