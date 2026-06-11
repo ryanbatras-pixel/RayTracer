@@ -1,66 +1,23 @@
-#include <fstream>
-#include <cmath>
-
-struct Vec3 {
-    double x, y, z;
-
-    Vec3(double x_, double y_, double z_)
-        : x(x_), y(y_), z(z_) {}
-
-    Vec3 operator-(const Vec3& v) const {
-        return Vec3(x - v.x, y - v.y, z - v.z);
-    }
-
-    double dot(const Vec3& v) const {
-        return x * v.x + y * v.y + z * v.z;
-    }
-};
-
-bool hitSphere(Vec3 center, double radius, Vec3 rayOrigin, Vec3 rayDir) {
-
-    Vec3 oc = rayOrigin - center;
-
-    double a = rayDir.dot(rayDir);
-    double b = 2.0 * oc.dot(rayDir);
-    double c = oc.dot(oc) - radius * radius;
-
-    double discriminant = b * b - 4 * a * c;
-
-    return discriminant >= 0;
-}
+#include "camera.h"
+#include "scene.h"
 
 int main() {
+    auto world = impressive_scene();
 
-    const int width = 256;
-    const int height = 256;
+    camera cam;
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 700;
+    cam.samples_per_pixel = 80;
+    cam.max_depth = 20;
+    cam.background = color(0.012, 0.014, 0.020);
 
-    std::ofstream image("output.ppm");
+    cam.vfov = 36;
+    cam.lookfrom = point3(5.2, 2.7, 5.6);
+    cam.lookat = point3(0.1, 0.7, -0.15);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.35;
+    cam.focus_dist = 6.8;
 
-    image << "P3\n";
-    image << width << " " << height << "\n255\n";
-
-    Vec3 sphereCenter(0, 0, -1);
-    Vec3 rayOrigin(0, 0, 0);
-
-    for (int y = 0; y < height; y++) {
-
-        for (int x = 0; x < width; x++) {
-
-            double u = (x - width / 2.0) / (width / 2.0);
-            double v = (height / 2.0 - y) / (height / 2.0);
-
-            Vec3 rayDir(u, v, -1);
-
-            if (hitSphere(sphereCenter, 0.5, rayOrigin, rayDir)) {
-                image << "255 0 0\n";
-            }
-            else {
-                image << "100 150 255\n";
-            }
-        }
-    }
-
-    image.close();
-
+    cam.render(world, "render.ppm");
     return 0;
 }
